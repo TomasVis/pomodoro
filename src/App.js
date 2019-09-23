@@ -28,58 +28,97 @@ class App extends React.Component {
   constructor(props){
     super(props)
 this.state ={
+    timerOn: false,
+    timerTime: 25*60*1000,
+    timerStart: "", //date now + sessionLength/breakLength
+    sessionLength: 25*60*1000,
+    breakLength: 5*60*1000,
+    timeLeft: 25*60*1000  // if pause is pressed this gets value of timerStart - date.now()
+  }
 
 }
-this.start = Date.now();
-this.startTimer = this.startTimer.bind(this)
 
-  }
- 
+startTimer = async () =>{
+  await this.setState({
+    timerOn: !this.state.timerOn
+  })
+  this.runTimer()           //state needs to be set before running the timer
+}
 
-startTimer = () => {
+runTimer = ()  => {
+  
+  if(this.state.timerOn){
   this.setState({
-    timerOn: true,
-    timerTime: this.state.timerTime,
-    timerStart: Date.now() - this.state.timerTime
-  });
-  this.timer = setInterval(() => {
-    this.setState({
-      timerTime: Date.now() - this.state.timerStart
-    });
-  }, 10);
-};
+    timerStart:  Date.now()+ this.state.timeLeft
 
+  })
+  this.run = setInterval(() => {
+    this.setState({
+      timerTime:this.state.timerStart  - Date.now() 
+    });
+    if(!this.state.timerOn) {
+      clearInterval(this.run);
+    }
+  }, 50);
+}
+else if(!this.state.timerOn){
+console.log("pause was pressed")
+this.setState({
+  timeLeft: this.state.timerStart - Date.now()
+})
+this.stop = setInterval(() => {
+    this.setState({
+      timerTime:this.state.timeLeft
+    });
+    if(this.state.timerOn) {
+      clearInterval(this.stop);
+    }
+  }, 0.1);
+}
+}
   render(){
+    const seconds = Math.floor(this.state.timerTime /1000) %60
+    const minutes = Math.floor(this.state.timerTime / 60000) % 60
   return (
     <div className="App">
       <header className="App-header">
 
       </header>
-      <body>
+      <div>
 
         <div>
           <h2 id="break-label">Break Length</h2><h2 id="session-label">Session Length</h2>
           <button id="break-decrement" >V</button>
-          <button id="session-decrement" >V</button>
+          
           <button id="break-increment" >^</button>
-          <button id="session-increment" >^</button>
+          
 
           <div id="break-length">5</div>
           <div id="session-length">25</div>
 
           <h2 id="timer-label">Session</h2>
-          <h2 id="time-left" ></h2>
+          <h2 id="time-left" >{minutes}:{seconds}</h2>
+          <Sesion/>
 
-          <button id="start_stop" >Start/stop</button>
+          <button id="start_stop" onClick={this.startTimer} >Start/stop</button>
           <button id="reset" >Reset</button>
 
         </div>
 
 
-      </body>
+      </div>
     </div>
   );
 }
 }
+
+const Sesion = () => {
+  return (
+    <div>
+      <button id="session-increment" onClick={startTimer} >^</button>
+      <button id="session-decrement" >V</button>
+    </div>
+  );
+};
 
 export default App;
