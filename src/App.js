@@ -37,6 +37,12 @@ this.state ={
   }
 
 }
+handleTimeChange = (id) =>{
+
+console.log(id)
+
+
+}
 
 startTimer = async () =>{
   await this.setState({
@@ -88,8 +94,9 @@ this.stop = setInterval(() => {
 
         <div>
           <h2 id="break-label">Break Length</h2><h2 id="session-label">Session Length</h2>
-          <button id="break-decrement" >V</button>
-          
+          <button id="break-decrement" onClick={() => this.handleTimeChange("break-decrement")} >V</button>
+          <button id="session-increment"  >^</button>
+          <button id="session-decrement" >V</button>
           <button id="break-increment" >^</button>
           
 
@@ -98,8 +105,7 @@ this.stop = setInterval(() => {
 
           <h2 id="timer-label">Session</h2>
           <h2 id="time-left" >{minutes}:{seconds}</h2>
-          <Sesion/>
-
+         
           <button id="start_stop" onClick={this.startTimer} >Start/stop</button>
           <button id="reset" >Reset</button>
 
@@ -112,13 +118,6 @@ this.stop = setInterval(() => {
 }
 }
 
-const Sesion = () => {
-  return (
-    <div>
-      <button id="session-increment" onClick={startTimer} >^</button>
-      <button id="session-decrement" >V</button>
-    </div>
-  );
-};
+
 
 export default App;
