@@ -33,39 +33,50 @@ this.state ={
     timerStart: "",           //date now + sessionLength/breakLength
     sessionTime: 25*60*1000,  //default value of session
     breakTime: 5*60*1000,     //default value of break
-    timeLeft: 5000 //25*60*1000,  // if pause is pressed this gets value of timerStart - date.now()
+    timeLeft: 25*60*1000 //25*60*1000,  // if pause is pressed this gets value of timerStart - date.now()
     //breakTime: 5000 //5*60*1000
   }
-
+this.setState({
+  timeLeft:this.state.sessionTime
+})
 }
+
 handleTimeChange = (id) =>{
-switch (id){
-  case "br-dec":this.setState({
+  if(!this.state.timerOn){
+    switch (id){
+      case "br-dec":this.setState({
 
-  breakTime:this.state.breakTime-60000
-  })
-  break;
+      breakTime:this.state.breakTime-60000
+      })
+      break;
 
-  case "br-inc":this.setState({
+      case "br-inc":this.setState({
 
-  breakTime:this.state.breakTime+60000
-  })
-  break;
-
-
-  case "se-dec":this.setState({
-
-  sessionTime:this.state.sessionTime-60000
-  })
-  break;
+      breakTime:this.state.breakTime+60000
+      })
+      break;
 
 
-  case "se-inc":this.setState({
+      case "se-dec":this.setState({
 
-  sessionTime:this.state.sessionTime+60000
-  })
-  break;
-  }
+      sessionTime:this.state.sessionTime-60000
+      })
+      break;
+
+
+      case "se-inc":this.setState({
+
+      sessionTime:this.state.sessionTime+60000
+      })
+      break;
+      }
+      this.setState({
+        timeLeft:this.state.sessionTime
+      })
+    }
+    else{
+      //do nothing
+    }
 }
 switchSesionToBreak = () => {
 console.log("time to switch")
@@ -83,7 +94,8 @@ this.runTimer()
 }
 startTimer = async () => {
   await this.setState({
-    timerOn: !this.state.timerOn
+    timerOn: !this.state.timerOn,
+
   })
   this.runTimer()           //state needs to be set before running the timer
 }
@@ -112,26 +124,26 @@ runTimer = ()  => {
     }
   }, 50);
 }
-else if(!this.state.timerOn){
-console.log("pause was pressed")
-this.setState({
-  timeLeft: this.state.timerStart - Date.now()
-})
-this.stop = setInterval(() => {
-    this.setState({
-      timeLeft:this.state.timeLeft
-    });
-    if(this.state.timerOn) {
-      clearInterval(this.stop);
-    }
-  }, 0.1);
-}
+  else if(!this.state.timerOn){
+  console.log("pause was pressed")
+  this.setState({
+    timeLeft: this.state.timerStart - Date.now()
+  })
+  this.stop = setInterval(() => {
+      this.setState({
+        timeLeft:this.state.timeLeft
+      });
+      if(this.state.timerOn) {
+        clearInterval(this.stop);
+      }
+    }, 0.1);
+  }
 }
   render(){
-    const seconds = Math.floor(this.state.timeLeft /1000) %60
-    const minutes = Math.floor(this.state.timeLeft / 60000) % 60
-    const breakTime = Math.floor(this.state.breakTime/ 60000) % 60
-    const sessionTime = Math.floor(this.state.sessionTime/ 60000) % 60
+    const seconds = (Math.floor(this.state.timeLeft /1000) %60).toString().padStart(2, "0")
+    const minutes = (Math.floor(this.state.timeLeft / 60000) % 60).toString().padStart(2, "0")
+    const breakTime = (Math.floor(this.state.breakTime/ 60000) % 60).toString().padStart(2, "0")
+    const sessionTime = (Math.floor(this.state.sessionTime/ 60000) % 60).toString().padStart(2, "0")
   return (
     <div className="App">
       <header className="App-header">
@@ -140,18 +152,24 @@ this.stop = setInterval(() => {
       <div>
 
         <div>
-          <h2 id="break-label">Break Length</h2><h2 id="session-label">Session Length</h2>
-          <button id="break-decrement" onClick={() => this.handleTimeChange("br-dec")} >bV</button>
-          <button id="session-increment" onClick={() => this.handleTimeChange("se-inc")}  >^</button>
+          
+          <h2 id="session-label">Session Length</h2>
+          <div id="session-length">{sessionTime}</div>
+                    <button id="session-increment" onClick={() => this.handleTimeChange("se-inc")}  >^</button>
           <button id="session-decrement" onClick={() => this.handleTimeChange("se-dec")} >V</button>
+
+          <h2 id="break-label">Break Length</h2>
+          <div id="break-length" >{breakTime}</div>
+          <button id="break-decrement" onClick={() => this.handleTimeChange("br-dec")} >bV</button>
+
           <button id="break-increment" onClick={() => this.handleTimeChange("br-inc")} >b^</button>
           
 
-          <div id="break-length"value= {this.breakTime}></div>
-          <div id="session-length">{sessionTime}</div>
+          
+          
 
           <h2 id="timer-label">Session</h2>
-          <h2 id="time-left" value= {minutes+":"+seconds}></h2>
+          <h2 id="time-left">{minutes+":"+seconds}</h2>
          
           <button id="start_stop" onClick={this.startTimer} >Start/stop</button>
           <button id="reset" >Reset</button>
