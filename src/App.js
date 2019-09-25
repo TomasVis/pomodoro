@@ -139,6 +139,24 @@ runTimer = ()  => {
     }, 0.1);
   }
 }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+
+    this.setState({
+      date: new Date()
+    });
+  }
   render(){
     const seconds = (Math.floor(this.state.timeLeft /1000) %60).toString().padStart(2, "0")
     const minutes = (Math.floor(this.state.timeLeft / 60000) % 60).toString().padStart(2, "0")
