@@ -33,12 +33,12 @@ this.state ={
     timerStart: "",           //date now + sessionLength/breakLength
     sessionTime: 25*60*1000,  //default value of session
     breakTime: 5*60*1000,     //default value of break
-    timeLeft: 25*60*1000 //25*60*1000,  // if pause is pressed this gets value of timerStart - date.now()
+    timeLeft: 0 //25*60*1000,  // if pause is pressed this gets value of timerStart - date.now()
     //breakTime: 5000 //5*60*1000
   }
-this.setState({
+/*this.setState({
   timeLeft:this.state.sessionTime
-})
+})*/
 }
 
 handleTimeChange = (id) =>{
@@ -70,9 +70,7 @@ handleTimeChange = (id) =>{
       })
       break;
       }
-      this.setState({
-        timeLeft:this.state.sessionTime
-      })
+      
     }
     else{
       //do nothing
@@ -103,10 +101,19 @@ startTimer = async () => {
 runTimer = ()  => {
   
   if(this.state.timerOn){
-  this.setState({
+    if(this.state.timeLeft===0){
+    this.setState({
+    timerStart:  Date.now()+ this.state.sessionTime
+
+  })
+
+    }
+      else if(this.state.timeLeft>0){
+    this.setState({
     timerStart:  Date.now()+ this.state.timeLeft
 
   })
+}
   this.run = setInterval(() => {
     this.setState({
       timeLeft:this.state.timerStart  - Date.now() 
@@ -122,7 +129,7 @@ runTimer = ()  => {
       clearInterval(this.run);
       this.switchSesionToBreak();
     }
-  }, 50);
+  }, 500);
 }
   else if(!this.state.timerOn){
   console.log("pause was pressed")
@@ -136,26 +143,21 @@ runTimer = ()  => {
       if(this.state.timerOn) {
         clearInterval(this.stop);
       }
-    }, 0.1);
+    }, 500);
   }
 }
 
   componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),
-      1000
-    );
+    
+
   }
 
   componentWillUnmount() {
-    clearInterval(this.timerID);
+    
   }
 
   tick() {
 
-    this.setState({
-      date: new Date()
-    });
   }
   render(){
     const seconds = (Math.floor(this.state.timeLeft /1000) %60).toString().padStart(2, "0")
@@ -170,11 +172,14 @@ runTimer = ()  => {
       <div>
 
         <div>
+        <h1>{Date(this.state.sessionTime)}</h1>
           
           <h2 id="session-label">Session Length</h2>
           <div id="session-length">{sessionTime}</div>
                     <button id="session-increment" onClick={() => this.handleTimeChange("se-inc")}  >^</button>
           <button id="session-decrement" onClick={() => this.handleTimeChange("se-dec")} >V</button>
+
+
 
           <h2 id="break-label">Break Length</h2>
           <div id="break-length" >{breakTime}</div>
