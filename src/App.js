@@ -1,73 +1,126 @@
+
+
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 
-
-/*
-
-
-User Story #11: When I click the element with the id of reset, any running timer should be stopped, the value within id="break-length"should return to 5, the value within id="session-length"should return to 25, and the element with id="time-left"should reset to it's default state.
-User Story #12: When I click the element with the id of break-decrement, the value within id="break-length"decrements by a value of 1, and I can see the updated value.
-User Story #13: When I click the element with the id of break-increment, the value within id="break-length"increments by a value of 1, and I can see the updated value.
-User Story #14: When I click the element with the id of session-decrement, the value within id="session-length"decrements by a value of 1, and I can see the updated value.
-User Story #15: When I click the element with the id of session-increment, the value within id="session-length"increments by a value of 1, and I can see the updated value.
-User Story #16: I should not be able to set a session or break length to <= 0.
-User Story #17: I should not be able to set a session or break length to > 60.
-User Story #18: When I first click the element with id="start_stop", the timer should begin running from the value currently displayed in id="session-length", even if the value has been incremented or decremented from the original value of 25.
-User Story #19: If the timer is running, the element with the id of time-leftshould display the remaining time in mm:ssformat (decrementing by a value of 1 and updating the display every 1000ms).
-User Story #20: If the timer is running and I click the element with id="start_stop", the countdown should pause.
-User Story #21: If the timer is paused and I click the element with id="start_stop", the countdown should resume running from the point at which it was paused.
-User Story #22: When a session countdown reaches zero (NOTE: timer MUST reach 00:00), and a new countdown begins, the element with the id of timer-labelshould display a string indicating a break has begun.
-User Story #23: When a session countdown reaches zero (NOTE: timer MUST reach 00:00), a new break countdown should begin, counting down from the value currently displayed in the id="break-length"element.
-User Story #24: When a break countdown reaches zero (NOTE: timer MUST reach 00:00), and a new countdown begins, the element with the id of timer-labelshould display a string indicating a session has begun.
-User Story #25: When a break countdown reaches zero (NOTE: timer MUST reach 00:00), a new session countdown should begin, counting down from the value currently displayed in the id="session-length"element.
-User Story #26: When a countdown reaches zero (NOTE: timer MUST reach 00:00), a sound indicating that time is up should play. This should utilize an HTML5 audiotag and have a corresponding id="beep".
-User Story #27: The audio element with id="beep"must be 1 second or longer.
-User Story #28: The audio element with id of beepmust stop playing and be rewound to the beginning when the element with the id of resetis clicked.*/
-class App extends React.Component {
-  constructor(props){
-    super(props)
-this.state ={
-    timerOn: false,            //if false, timer is either paused, or was not started
-    isSessionRunning: true ,  //if false, break time is running, if true, session time is running
-    timerStart: "",           //date now + sessionLength/breakLength
-    sessionTime: 25*60*1000,  //default value of session
-    breakTime: 5*60*1000,     //default value of break
-    timeLeft: 0 //25*60*1000,  // if pause is pressed this gets value of timerStart - date.now()
-    //breakTime: 5000 //5*60*1000
-  }
-/*this.setState({
-  timeLeft:this.state.sessionTime
-})*/
+function TimerDisplay(props) {
+  console.log(props.date)
+  let val = props.date.getMinutes().toString().padStart(2, "0")+":"+
+  props.date.getSeconds().toString().padStart(2, "0")
+  return <h2 id = {props.id} >{val}</h2>;
 }
 
-handleTimeChange = (id) =>{
-  if(!this.state.timerOn){
+function Adjustment(props) {
+  console.log(props.date)
+  //return <h2>It is {props.date.getMinutes()}:{props.date.getSeconds()}.</h2>;
+  return <h2 id = {props.id}>{props.date.getMinutes()}</h2>;
+}
+
+
+class Clickity extends React.Component {
+    constructor(props){
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+
+  }
+  handleClick(){
+    console.log("clickity from child")
+    this.props.click(this.props.id)
+  }
+    render(){
+    return <button onClick={this.handleClick} id ={this.props.id}>{this.props.name}</button>
+
+  }
+}
+class IncDecButton extends React.Component {
+    constructor(props){
+    super(props);
+    this.handleInc = this.handleInc.bind(this);
+  }
+  handleInc(){
+    console.log("IncDecButton from child")
+    console.log(this.props)
+    this.props.click(this.props.id)
+  }
+    render(){
+    return <button onClick={this.handleInc} id ={this.props.id}> {this.props.name}</button>
+    
+  }
+}
+
+class Clock1 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      time: new Date(20000),
+      isTimerRunning: false,
+      biggerDate: Date.now(),
+      timeToAdd:0,
+      breakTime:5*60*1000,
+      sessionTime: 25*60*1000,
+      isBreakTime: false
+      
+    };
+    this.handleClick = this.handleClick.bind(this)
+    this.handleInc = this.handleInc.bind(this)
+  }
+
+componentDidMount() {
+//console.log(this.state.timeToAdd)
+  this.setState({
+    time:new Date(this.state.sessionTime),
+    timeToAdd:this.state.sessionTime
+  })
+}
+reset(){
+
+}
+
+
+handleInc(id){
+
+  console.log("IncDecButton from parent")
+  console.log("ID is : "+id)
+  if(!this.state.isTimerRunning){
+    let newTime =this.state.sessionTime
     switch (id){
-      case "br-dec":this.setState({
+      case "break-decrement":
+         newTime =this.state.breakTime - 60000
+        this.setState({
+          
+          breakTime: newTime
 
-      breakTime:this.state.breakTime-60000
-      })
+        })
       break;
 
-      case "br-inc":this.setState({
+      case "break-increment":
+         newTime =this.state.breakTime + 60000
+        this.setState({
+          
+          breakTime: newTime
 
-      breakTime:this.state.breakTime+60000
-      })
+        })
       break;
 
 
-      case "se-dec":this.setState({
+      case "session-decrement":
+         newTime =this.state.sessionTime - 60000
+        this.setState({
+          time:new Date(newTime),
+          sessionTime: newTime,
+          timeToAdd: newTime
 
-      sessionTime:this.state.sessionTime-60000
-      })
+        })
       break;
 
 
-      case "se-inc":this.setState({
+      case "session-increment":
+        newTime =this.state.sessionTime + 60000
+        this.setState({
+          time:new Date(newTime),
+          sessionTime: newTime,
+          timeToAdd: newTime
 
-      sessionTime:this.state.sessionTime+60000
-      })
+        })
       break;
       }
       
@@ -75,137 +128,122 @@ handleTimeChange = (id) =>{
     else{
       //do nothing
     }
-}
-switchSesionToBreak = () => {
-console.log("time to switch")
-  if(this.isSessionRunning){
-    this.setState({
-      timeLeft: this.state.sessionTime
-    })
-  }
-  else{
-    this.setState({
-      timeLeft: this.state.breakTime
-    })
-  }
-this.runTimer()
-}
-startTimer = async () => {
-  await this.setState({
-    timerOn: !this.state.timerOn,
-
-  })
-  this.runTimer()           //state needs to be set before running the timer
-}
-
-runTimer = ()  => {
   
-  if(this.state.timerOn){
-    if(this.state.timeLeft===0){
-    this.setState({
-    timerStart:  Date.now()+ this.state.sessionTime
-
-  })
-
-    }
-      else if(this.state.timeLeft>0){
-    this.setState({
-    timerStart:  Date.now()+ this.state.timeLeft
-
-  })
 }
-  this.run = setInterval(() => {
+
+
+
+  handleClick(id){
+    console.log("clickity")
+    console.log(id)
+
+    if(!this.state.isTimerRunning){
     this.setState({
-      timeLeft:this.state.timerStart  - Date.now() 
-    });
-    if(!this.state.timerOn) {
-      clearInterval(this.run);
+      isTimerRunning:true,
+      biggerDate:this.state.timeToAdd+Date.now().valueOf()
+    })
+    this.runTimer()
     }
-    else if(this.state.timeLeft<999){
-      console.log("time is up")
+    //saves amount of timer time left in state.timeToAdd
+    else{
       this.setState({
-        isSessionRunning:!this.state.isSessionRunning     // switch between session and break
+      isTimerRunning:false,
+      timeToAdd:this.state.biggerDate-Date.now().valueOf()
+    })
+    
+    }
+  }
+
+  runTimer(){
+
+      this.timerSession = setInterval(
+        () => {this.tick()
+         if(!this.state.isTimerRunning) {
+        clearInterval(this.timerSession);
+      }},
+        100
+      );
+
+}
+
+tick() {
+
+
+  if(new Date(this.state.biggerDate - new Date().valueOf())<0){
+    //if timeLeft = 0, switch between break time and session time
+    if(!this.state.isBreakTime){
+      this.setState({
+        isBreakTime: !this.state.isBreakTime,
+        biggerDate: Date.now().valueOf()+this.state.breakTime
+        //isTimerRunning:false
       })
-      clearInterval(this.run);
-      this.switchSesionToBreak();
-    }
-  }, 500);
-}
-  else if(!this.state.timerOn){
-  console.log("pause was pressed")
-  this.setState({
-    timeLeft: this.state.timerStart - Date.now()
-  })
-  this.stop = setInterval(() => {
+
+  }
+    else{
       this.setState({
-        timeLeft:this.state.timeLeft
-      });
-      if(this.state.timerOn) {
-        clearInterval(this.stop);
+        isBreakTime: !this.state.isBreakTime,
+        biggerDate: Date.now().valueOf()+this.state.sessionTime
+        //isTimerRunning:false
+      })
+
+    }
+      
+  }
+  else{  this.setState({
+      time: new Date(this.state.biggerDate - new Date().valueOf())
+        });
       }
-    }, 500);
+  }
+  
+  render() {
+    return (
+      <div>
+        <h1 id="timer-label">{this.state.isBreakTime ? "Break" : "Session"}</h1>
+        <TimerDisplay id="time-left" date={this.state.time} />
+        <Clickity click= {this.handleClick} id="start_stop" name={'Start/Stop'}/>
+        <h1 id="session-label">Session Timer</h1>
+        <Adjustment id="session-length" date={new Date(this.state.sessionTime)} />
+        <IncDecButton click= {this.handleInc} id={"session-increment"} name={'^'}/>
+        <IncDecButton click= {this.handleInc} id={"session-decrement"} name={'V'}/>
+        <h1 id="break-label" >Break Timer</h1>
+        <Adjustment id="break-length"  date={new Date(this.state.breakTime)} />
+        <IncDecButton click= {this.handleInc} id={"break-decrement"} name={'BV'}/>
+        <IncDecButton click= {this.handleInc} id={"break-increment"} name={'B^'}/>
+      </div>
+    );
   }
 }
 
-  componentDidMount() {
-    
 
-  }
 
-  componentWillUnmount() {
-    
-  }
 
-  tick() {
 
-  }
-  render(){
-    const seconds = (Math.floor(this.state.timeLeft /1000) %60).toString().padStart(2, "0")
-    const minutes = (Math.floor(this.state.timeLeft / 60000) % 60).toString().padStart(2, "0")
-    const breakTime = (Math.floor(this.state.breakTime/ 60000) % 60).toString().padStart(2, "0")
-    const sessionTime = (Math.floor(this.state.sessionTime/ 60000) % 60).toString().padStart(2, "0")
+function App() {
   return (
     <div className="App">
-      <header className="App-header">
-
-      </header>
-      <div>
-
-        <div>
-        <h1>{Date(this.state.sessionTime)}</h1>
-          
-          <h2 id="session-label">Session Length</h2>
-          <div id="session-length">{sessionTime}</div>
-                    <button id="session-increment" onClick={() => this.handleTimeChange("se-inc")}  >^</button>
-          <button id="session-decrement" onClick={() => this.handleTimeChange("se-dec")} >V</button>
-
-
-
-          <h2 id="break-label">Break Length</h2>
-          <div id="break-length" >{breakTime}</div>
-          <button id="break-decrement" onClick={() => this.handleTimeChange("br-dec")} >bV</button>
-
-          <button id="break-increment" onClick={() => this.handleTimeChange("br-inc")} >b^</button>
-          
-
-          
-          
-
-          <h2 id="timer-label">Session</h2>
-          <h2 id="time-left">{minutes+":"+seconds}</h2>
-         
-          <button id="start_stop" onClick={this.startTimer} >Start/stop</button>
-          <button id="reset" >Reset</button>
-
-        </div>
-
-
-      </div>
+     <Clock1 /> 
     </div>
   );
 }
-}
-
-
 
 export default App;
+/*
+
+
+
+
+User Story #10: I can see a clickable element with a corresponding id="reset".
+User Story #11: When I click the element with the id of reset, any running timer should be stopped, the value within id="break-length"should return to 5, the value within id="session-length"should return to 25, and the element with id="time-left"should reset to it's default state.
+
+
+User Story #16: I should not be able to set a session or break length to <= 0.
+User Story #17: I should not be able to set a session or break length to > 60.
+
+
+
+
+User Story #26: When a countdown reaches zero (NOTE: timer MUST reach 00:00), a sound indicating that time is up should play. This should utilize an HTML5 audiotag and have a corresponding id="beep".
+User Story #27: The audio element with id="beep"must be 1 second or longer.
+User Story #28: The audio element with id of beepmust stop playing and be rewound to the beginning when the element with the id of resetis clicked.
+
+*/
